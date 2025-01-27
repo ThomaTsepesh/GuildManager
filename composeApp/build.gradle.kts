@@ -10,19 +10,23 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 }
-
+repositories {
+    mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.jetbrains.space/public/p/dev/gitlive/dev")
+    }
+    google()
+}
 kotlin {
     androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        compilerOptions {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class) compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     jvm("desktop")
-    
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
+
+    @OptIn(ExperimentalWasmDsl::class) wasmJs {
         moduleName = "composeApp"
         browser {
             val rootDirPath = project.rootDir.path
@@ -40,11 +44,11 @@ kotlin {
         }
         binaries.executable()
     }
-    
     sourceSets {
         val desktopMain by getting
-        
+
         androidMain.dependencies {
+            implementation(libs.androidx.core.ktx.v1101)
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
         }
@@ -60,8 +64,16 @@ kotlin {
 
             implementation(libs.navigation.compose)
 
+            implementation(libs.kotlin.stdlib)
+            implementation(libs.kotlinx.coroutines.core)
         }
+
         desktopMain.dependencies {
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
         }
@@ -70,6 +82,8 @@ kotlin {
         }
     }
 }
+
+
 
 android {
     namespace = "org.example.project"
@@ -100,6 +114,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.google.firebase.firestore.ktx)
     debugImplementation(compose.uiTooling)
 }
 
