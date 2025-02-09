@@ -1,9 +1,10 @@
 package org.example.project
 
-import android.os.Build
-
-class AndroidPlatform : Platform {
-    override val name: String = "Android ${Build.VERSION.SDK_INT}"
+actual object Platform {
+    actual val isAndroid: Boolean
+        get() = true
+    actual val isWasm: Boolean
+        get() = false
+    actual val isDesktop: Boolean
+        get() = false
 }
-
-actual fun getPlatform(): Platform = AndroidPlatform()

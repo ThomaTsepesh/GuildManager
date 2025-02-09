@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 }
+
 repositories {
     mavenCentral()
     maven {
@@ -17,6 +18,7 @@ repositories {
     }
     google()
 }
+
 kotlin {
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class) compilerOptions {
@@ -35,7 +37,6 @@ kotlin {
                 outputFileName = "composeApp.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
                         add(rootDirPath)
                         add(projectDirPath)
                     }
@@ -44,6 +45,7 @@ kotlin {
         }
         binaries.executable()
     }
+
     sourceSets {
         val desktopMain by getting
 
@@ -51,7 +53,12 @@ kotlin {
             implementation(libs.androidx.core.ktx.v1101)
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(platform("com.google.firebase:firebase-bom:33.8.0"))
+            implementation("com.google.firebase:firebase-database-ktx")
+            implementation("com.google.firebase:firebase-auth-ktx")
+            implementation("io.insert-koin:koin-android:3.5.0")
         }
+
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -61,11 +68,11 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
-
             implementation(libs.navigation.compose)
-
             implementation(libs.kotlin.stdlib)
             implementation(libs.kotlinx.coroutines.core)
+
+            implementation("io.insert-koin:koin-core:3.5.0")
         }
 
         desktopMain.dependencies {
@@ -73,17 +80,18 @@ kotlin {
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
-
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
-        }
-        wasmJsMain.dependencies {
 
+            implementation("io.insert-koin:koin-core:3.5.0")
+        }
+
+        wasmJsMain.dependencies {
+            implementation(npm("firebase", "9.6.1"))
+            implementation("io.insert-koin:koin-core:3.5.0")
         }
     }
 }
-
-
 
 android {
     namespace = "org.example.project"
@@ -96,16 +104,19 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

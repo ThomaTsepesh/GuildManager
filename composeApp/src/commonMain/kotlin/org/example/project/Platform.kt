@@ -1,7 +1,7 @@
 package org.example.project
 
-interface Platform {
-    val name: String
+expect object Platform {
+    val isAndroid: Boolean
+    val isWasm: Boolean
+    val isDesktop: Boolean
 }
-
-expect fun getPlatform(): Platform
